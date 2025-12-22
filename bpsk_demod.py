@@ -9,9 +9,6 @@ import matplotlib.pyplot as plt
 
 filename = 'data/rectangular_bpsk_sps_10_complex_float32.bin'
 iq_data = parse.parse_iq_file(filename,np.float32,np.complex64)
-# iq_data = parse.parse_iq_file(filename,"<f2",np.complex64) #Little endian float
-# iq_data2 = parse.parse_iq_file(filename,">f2",np.complex64) #Big endian float
-# iq_data = parse.parse_iq_file(filename,np.int16,np.complex64)
 
 # Plot the Signal from the file
 plotters.plot_real_imag(iq_data)
@@ -53,8 +50,9 @@ f_freqz,mag_freqz,phase_freqz = plotters.plot_freqz(h,nfft_match)
 # plotters.plot_real_imag(iq_matched_filt)
 
 # Most SNR at Center bin (Triangle peak)
-plotters.plot(iq_matched_filt)
+plotters.plot_real_imag(iq_matched_filt)
 iq_demod_timings = iq_matched_filt[samples_per_symbol//2::samples_per_symbol]
+plotters.plot_bpsk_pulse_timings(iq_matched_filt,fs,samples_per_symbol,0)
 # plotters.plot_real_imag(iq_demod_timings)
 plotters.plot_constellation(iq_demod_timings)
 
@@ -65,8 +63,7 @@ iq_demod_timings_rot = iq_demod_timings * np.exp(-1j*phi_hat)
 print(f"Estimated Rotation: {np.degrees(phi_hat)} deg")
 
 # Demodulate Signal - Only need the real part if constellation is not rotated
-# demod_bits = np.real(iq_demod_timings) >= 0
-demod_bits = np.real(iq_demod_timings_rot)
+demod_bits = np.real(iq_demod_timings) >= 0
 demod_amplitudes = 2*demod_bits.astype(np.float32) - 1
 
 #Estimate SNR
