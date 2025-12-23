@@ -46,8 +46,9 @@ h = np.ones(samples_per_symbol)/samples_per_symbol
 iq_matched_filt = np.convolve(iq_data,h,mode='same')
 nfft_match = 2048
 f_match,fft_match = plotters.plot_fft_magnitude_phase(h,fs,nfft_match)
-f_freqz,mag_freqz,phase_freqz = plotters.plot_freqz(h,nfft_match)
+w_matched,H_matched = plotters.plot_freqz(h,nfft_match)
 # plotters.plot_real_imag(iq_matched_filt)
+plotters.plot_group_delay(w_matched,H_matched)
 
 # Most SNR at Center bin (Triangle peak)
 plotters.plot_real_imag(iq_matched_filt)
