@@ -51,6 +51,7 @@ def plot_fft_magnitude_phase(iq_data:np.array,fs:float=1.0,nfft:int=None):
     ax[1].set_ylabel('Phase (rad)')
     ax[1].set_title('FFT Phase Response')
     ax[1].grid(True)
+    ax[1].sharex(ax[0])
     plt.show(block=False)
 
     return f,iq_fft
@@ -73,27 +74,26 @@ def plot_freqz(h_fir:np.array,nfft:int=None):
     phase = np.angle(H)
 
     # Plot magnitude
-    plt.figure()
-    plt.subplot(1,2,1)
+    fig,ax = plt.subplots(2,1)
     # plt.plot(f, magnitude, label='Linear magnitude')
-    plt.plot(f, magnitude_dB, label='Magnitude (dB)')
-    plt.xlabel('Normalized frequency [cycles/sample]')
-    plt.ylabel('Magnitude')
-    plt.title('FIR Filter Magnitude Response')
-    plt.grid(True)
-    plt.legend()
+    ax[0].plot(f, magnitude_dB, label='Magnitude (dB)')
+    ax[0].set_xlabel('Normalized frequency [cycles/sample]')
+    ax[0].set_ylabel('Magnitude')
+    ax[0].set_title('FIR Filter Magnitude Response')
+    ax[0].grid(True)
+    ax[0].legend()
 
     # Plot phase
-    plt.subplot(1,2,2)
-    plt.plot(f, phase)
-    plt.xlabel('Normalized frequency [cycles/sample]')
-    plt.ylabel('Phase [radians]')
-    plt.title('FIR Filter Phase Response')
-    plt.grid(True)
+    ax[1].plot(f, phase)
+    ax[1].set_xlabel('Normalized frequency [cycles/sample]')
+    ax[1].set_ylabel('Phase [radians]')
+    ax[1].set_title('FIR Filter Phase Response')
+    ax[1].sharex(ax[0])
+    ax[1].grid(True)
 
     plt.show(block=False)
 
-    return f,magnitude,phase
+    return w,H
 
 def plot_welch_psd(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1024,fs:float=1.0):
     
@@ -113,6 +113,7 @@ def plot_spectrogram(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int
     f,t,Sxx = frequency_response.compute_spectrogram(iq_data,nperseg,noverlap,nfft,fs)
     fig = plt.figure()
     plt.pcolormesh(t[0::plot_time_downsample], f, Sxx[:,0::plot_time_downsample], shading='nearest')
+    plt.title("Spectrogram Plot")
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (s)')
     plt.show(block=False)
@@ -141,4 +142,30 @@ def plot_constellation(iq_data:np.array):
     plt.grid(True)
     plt.show(block=False)
     return
+
+def plot_bpsk_pulse_timings(iq_data:np.array,fs:int,samples_per_symbol:int,offset:int=0):
+    t = np.arange(0,len(iq_data),1)/fs
+    t_timing = t[samples_per_symbol//2+offset::samples_per_symbol]
+    iq_data_timing = iq_data[samples_per_symbol//2+offset::samples_per_symbol]
+    fig = plt.figure()
+    plt.plot(t,iq_data.real,label='BPSK Real')
+    plt.scatter(t_timing,iq_data_timing.real,marker='o',label='Sample Timings')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.title('Optimal Sample Times')
+    plt.legend()
+    plt.grid(True)
+    plt.show(block=False)
+    return
+
+def plot_group_delay(w,H):
+    gd = frequency_response.compute_group_delay(w,H)
+    plt.figure()
+    plt.plot(w[:-1], gd)
+    plt.xlabel("Frequency (rad/sample)")
+    plt.ylabel("Group Delay (samples)")
+    plt.title("Group Delay Response")
+    plt.grid(True)
+    plt.show(block=False)
+    return gd
     
