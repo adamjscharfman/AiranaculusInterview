@@ -2,8 +2,8 @@ import numpy as np
 
 def apply_frequency_shift(iq_data:np.array,fc_offset:float,fs:float):
     #X(w-wfc) <=> x(t)e^(-1j*wfc*t)
-    t = np.arange(len(iq_data))/fs
-    iq_data_shifted = iq_data * np.exp(-1j*2*np.pi*fc_offset*t)
+    n = np.arange(len(iq_data))
+    iq_data_shifted = iq_data * np.exp(-1j*2*np.pi*fc_offset*n/fs)
     return iq_data_shifted
 
 def compute_average_phase(iq_data:np.array,samples_per_symbol:int,offset:int=0):
