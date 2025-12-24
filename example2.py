@@ -48,13 +48,13 @@ print(f"BW Estimated {signal_1_bw}, Up: {up_factor}, Down: {down_factor}")
 
 # Approach 1: Design a Lowpass FIR filter and shift it to the passband of the signal
 # numtaps = 100
-numtaps = 201      # Size of the FIR filter.
+numtaps = 261      # Size of the FIR filter.
 # Prototype cutoff = half bandwidth
 fp = signal_1_bw / 2
 fsb = fp * 1.1   # 10% transition band (reasonable)
 bands = [0.0, fp, fsb, 0.5]
 desired = [1, 0]
-# weight = [10,1]
+weight = [1,30]
 # Use the Parks Mclellan or Remez Algorithm
 h_lp = scipy.signal.remez(
     numtaps,
@@ -65,8 +65,8 @@ h_lp = scipy.signal.remez(
 )
 h_bp = demod.apply_frequency_shift(h_lp,-signal_1_fc,fs) #Shift Lowpass filter to passband of signal
 w_bp,H_bp = plotters.plot_freqz(h_bp,title_str="Bandpass Filter 1")
-plotters.plot_fft_magnitude_phase(h_bp,1024,title_str="Bandpass Filter 1")
-plotters.plot_group_delay(w_bp,H_bp,title_str="Bandpass Filter 1")
+plotters.plot_fft_magnitude_phase(h_bp,nfft=1024,title_str="Bandpass Filter 1")
+plotters.plot_group_delay(h_bp,1,title_str="Bandpass Filter 1")
 
 # Apply Filter
 signal_1_filtered = scipy.signal.lfilter(h_bp,1,iq_data)
@@ -78,12 +78,12 @@ signal_1_basebanded = demod.apply_frequency_shift(signal_1_filtered,signal_1_fc,
 f_welch,Pxx_welch = plotters.plot_welch_psd(signal_1_basebanded,nperseg,noverlap,nfft,fs,"Signal 1 Basebanded (Post Filter)")
 
 # Downsample Signal
-signal_1_downsampled = scipy.signal.resample_poly(signal_1_filtered, up_factor, down_factor)
-plotters.plot_real_imag(signal_1_downsampled,fs,title_str="Signal 1 Downconverted")
+signal_1_downsampled = scipy.signal.resample_poly(signal_1_basebanded, up_factor, down_factor)
 t_block,mag_block = plotters.plot_block_magnitude(signal_1_downsampled,nperseg,noverlap,fs*up_factor/down_factor,"Filtered Signal 1 Basebanded and Resampled")
 plotters.plot_real_imag(signal_1_downsampled,fs*up_factor/down_factor,title_str="Signal 1 Resampled")
 plotters.plot_welch_psd(signal_1_downsampled,nperseg*up_factor/down_factor,noverlap*up_factor/down_factor,nperseg*up_factor/down_factor,fs*up_factor/down_factor,title_str="Signal 1 Resampled")
 
+plotters.plot_constellation(signal_1_downsampled)
 breakpoint()
 
 # # Approach 2: Design a bandtop filter at the interference to isolate the signal
