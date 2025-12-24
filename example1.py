@@ -85,4 +85,6 @@ plotters.plot_real_imag(signal_basebanded,fs,title_str="Signal Basebanded")
 # Downsample Signal
 signal_downsampled = scipy.signal.resample_poly(signal_basebanded, up_factor, down_factor)
 plotters.plot_real_imag(signal_downsampled,fs*up_factor/down_factor,title_str="Signal Resampled")
+plotters.plot_welch_psd(signal_downsampled,nperseg*up_factor/down_factor,noverlap*up_factor/down_factor,nperseg*up_factor/down_factor,fs*up_factor/down_factor,title_str="Signal Resampled")
+
 breakpoint()
