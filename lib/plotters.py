@@ -16,7 +16,7 @@ def plot_real_imag(iq_data:np.array,fs:float=1.0,title_str:str=None):
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
     plt.title(f'{fig_title}')
-    plt.legend()
+    plt.legend(loc='upper right')
     plt.grid(True)
     plt.show(block=False)
     return
@@ -48,9 +48,9 @@ def plot_fft_magnitude_phase(iq_data:np.array,fs:float=1.0,nfft:int=None,title_s
     f = np.arange(-fs/2,fs/2,fs/nfft)
     iq_fft = np.fft.fftshift(np.fft.fft(iq_data,nfft))
     fig,ax = plt.subplots(2,1)
-    ax[0].plot(f,np.abs(iq_fft))
+    ax[0].plot(f,20*np.log10(np.abs(iq_fft)))
     ax[0].set_xlabel('Frequency (Hz)')
-    ax[0].set_ylabel('Magnitude')
+    ax[0].set_ylabel('Power (dB)')
     ax[0].set_title('FFT Magnitude Response')
     ax[0].grid(True)
 
@@ -93,7 +93,7 @@ def plot_freqz(h_fir:np.array,nfft:int=None,title_str:str=None)->tuple[np.array,
     ax[0].set_ylabel('Magnitude')
     ax[0].set_title('FIR Filter Magnitude Response')
     ax[0].grid(True)
-    ax[0].legend()
+    ax[0].legend(loc='upper right')
 
     # Plot phase
     ax[1].plot(f, phase)
@@ -185,20 +185,24 @@ def plot_bpsk_pulse_timings(iq_data:np.array,fs:int,samples_per_symbol:int,offse
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
     plt.title(f"{fig_title}")
-    plt.legend()
+    plt.legend(loc='upper right')
     plt.grid(True)
     plt.show(block=False)
     return
 
-def plot_group_delay(w:np.array,H:np.array,title_str:str=None)->np.array:
+def plot_group_delay(b,a,fs:float=1.0,nfft:int=1024,title_str:str=None)->np.array:
 
     fig_title = "Group Delay Response"
     if title_str is not None:
         fig_title = f"{title_str} Group Delay Response"
-    gd = frequency_response.compute_group_delay(w,H)
+    worN = np.arange(-np.pi,np.pi,2*np.pi/nfft)
+    _,H = scipy.signal.freqz(b,a,worN=worN)
+    gd = frequency_response.compute_group_delay(worN,H)
+    f = worN*fs/(2*np.pi)
+    
     plt.figure()
-    plt.plot(w[:-1], gd)
-    plt.xlabel("Frequency (rad/sample)")
+    plt.plot(f[:-1], np.real(gd))
+    plt.xlabel("Frequency")
     plt.ylabel("Group Delay (samples)")
     plt.title(f"{fig_title}")
     plt.grid(True)
