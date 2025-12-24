@@ -1,6 +1,6 @@
 import numpy as np
 
-def compute_block_magnitude(iq_data:np.array,blocksize:int=1024,hop:int=512,fs:float=1.0):
+def compute_block_magnitude(iq_data:np.array,blocksize:int=1024,hop:int=512,fs:float=1.0)->tuple[np.array,np.array]:
     num_blocks = ((len(iq_data) - blocksize) // hop) + 1
     t = np.arange(0,len(iq_data),1)/fs
 
