@@ -10,6 +10,7 @@ def compute_spectrogram(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:
     return np.fft.fftshift(f),t,np.fft.fftshift(Sxx,axes=0)
 
 def compute_group_delay(w:np.array,H:np.array)->np.array:
-    gd = -np.diff(np.unwrap(np.angle(H))) / np.diff(w)
+    phase = np.unwrap(np.angle(H))
+    gd = -np.diff(phase) / np.diff(w)    
     return gd
 
