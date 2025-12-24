@@ -48,7 +48,7 @@ nfft_match = 2048
 f_match,fft_match = plotters.plot_fft_magnitude_phase(h,fs,nfft_match,title_str = "Matched Filter")
 w_matched,H_matched = plotters.plot_freqz(h,nfft_match,"Matched Filter")
 # plotters.plot_real_imag(iq_matched_filt)
-plotters.plot_group_delay(w_matched,H_matched,"Matched Filter")
+plotters.plot_group_delay(h,1,"Matched Filter")
 
 # Most SNR at Center bin (Triangle peak)
 plotters.plot_real_imag(iq_matched_filt)
