@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import frequency_response
 import magnitude_response
 
-def plot_real_imag(iq_data:np.array,fs=1.0,title_str:str=None):
+def plot_real_imag(iq_data:np.array,fs:float=1.0,title_str:str=None):
     fig_title = "IQ Data"
     if title_str is not None:
         fig_title = f"{title_str} IQ Data"
@@ -21,7 +21,7 @@ def plot_real_imag(iq_data:np.array,fs=1.0,title_str:str=None):
     plt.show(block=False)
     return
 
-def plot_fft_magnitude(iq_data:np.array,fs:float=1.0,nfft:int=None,title_str:str=None):
+def plot_fft_magnitude(iq_data:np.array,fs:float=1.0,nfft:int=None,title_str:str=None)->tuple[np.array,np.array]:
     if nfft is None:
         nfft = len(iq_data)
     
@@ -41,7 +41,7 @@ def plot_fft_magnitude(iq_data:np.array,fs:float=1.0,nfft:int=None,title_str:str
 
     return f,iq_fft
 
-def plot_fft_magnitude_phase(iq_data:np.array,fs:float=1.0,nfft:int=None,title_str:str=None):
+def plot_fft_magnitude_phase(iq_data:np.array,fs:float=1.0,nfft:int=None,title_str:str=None)->tuple[np.array,np.array]:
     if nfft is None:
         nfft = len(iq_data)
     
@@ -68,7 +68,7 @@ def plot_fft_magnitude_phase(iq_data:np.array,fs:float=1.0,nfft:int=None,title_s
 
     return f,iq_fft
 
-def plot_freqz(h_fir:np.array,nfft:int=None,title_str:str=None):
+def plot_freqz(h_fir:np.array,nfft:int=None,title_str:str=None)->tuple[np.array,np.array]:
     # Compute frequency response
     if nfft is None:
         nfft=len(h_fir)
@@ -110,7 +110,7 @@ def plot_freqz(h_fir:np.array,nfft:int=None,title_str:str=None):
 
     return w,H
 
-def plot_welch_psd(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1024,fs:float=1.0,title_str:str=None):
+def plot_welch_psd(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1024,fs:float=1.0,title_str:str=None)->tuple[np.array,np.array]:
     
     fig_title = "Welch PSD"
     if title_str is not None:
@@ -126,27 +126,29 @@ def plot_welch_psd(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1
 
     return f,Pxx
 
-def plot_spectrogram(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1024,fs:float=1.0,plot_time_downsample:int=1,title_str:str=None):
+def plot_spectrogram(iq_data:np.array,nperseg:int=1024,noverlap:int=512,nfft:int=1024,fs:float=1.0,plot_time_downsample:int=1,title_str:str=None)->tuple[np.array,np.array,np.array]:
     
     fig_title = "Spectrogram"
     if title_str is not None:
         fig_title = f"{title_str} Spectrogram"
     f,t,Sxx = frequency_response.compute_spectrogram(iq_data,nperseg,noverlap,nfft,fs)
+
     fig = plt.figure()
-    plt.pcolormesh(t[0::plot_time_downsample], f, Sxx[:,0::plot_time_downsample], shading='nearest')
+    plt.pcolormesh(t[0::plot_time_downsample], f, 20*np.log10(Sxx[:,0::plot_time_downsample]), shading='nearest')
     plt.title(f"{fig_title}")
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (s)')
+    plt.colorbar(label="dB")
     plt.show(block=False)
 
     return f,t,Sxx
 
-def plot_block_magnitude(iq_data:np.array,blocksize:int=1024,hop:int=512,fs:float=1.0,title_str:str=None):
+def plot_block_magnitude(iq_data:np.array,blocksize:int=1024,hop:int=512,fs:float=1.0,title_str:str=None)->tuple[np.array,np.array]:
     t_block,mag_block = magnitude_response.compute_block_magnitude(iq_data,blocksize,hop,fs)
     fig = plt.figure()
-    plt.plot(t_block,mag_block)
+    plt.plot(t_block,20*np.log10(mag_block))
     plt.xlabel('Time (s)')
-    plt.ylabel('Magnitude')
+    plt.ylabel('Power (dB)')
     plt.title(f'Overlapping Block Average: Block Size {blocksize}, Hop Size {hop}')
     plt.grid(True)
     if title_str is not None:
@@ -188,7 +190,7 @@ def plot_bpsk_pulse_timings(iq_data:np.array,fs:int,samples_per_symbol:int,offse
     plt.show(block=False)
     return
 
-def plot_group_delay(w:np.array,H:np.array,title_str:str=None):
+def plot_group_delay(w:np.array,H:np.array,title_str:str=None)->np.array:
 
     fig_title = "Group Delay Response"
     if title_str is not None:
